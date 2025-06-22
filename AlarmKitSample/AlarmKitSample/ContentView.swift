@@ -5,8 +5,8 @@
 //
 
 import AlarmKit
-import SwiftUI
 import AppIntents
+import SwiftUI
 
 struct ContentView: View {
     @State private var isAuthorized: Bool = false
@@ -31,7 +31,6 @@ struct ContentView: View {
         }
     }
 
-
     private func AlarmView() -> some View {
         List {
             Section("Alarms") {
@@ -49,46 +48,43 @@ struct ContentView: View {
             }
         }
     }
-    
+
     private func setAlarm() async throws {
         /// Alarm ID
         let id = UUID()
-        
+
         /// Scoundary Alert Button
         let secoundaryButton = AlarmButton(text: "Go to App", textColor: .white, systemImageName: "app.fill")
-        
-        ///Alart
+
+        /// Alart
         let alert = AlarmPresentation.Alert(
             title: "Alarm Scheduled",
             stopButton: .init(text: "Stop Alarm", textColor: .red, systemImageName: "stop.fill"),
             secondaryButton: secoundaryButton,
             secondaryButtonBehavior: .custom
         )
-        
+
         /// Presentation
         let presentation = AlarmPresentation(
             alert: alert
         )
-        
+
         /// Attributes
         let attributes = AlarmAttributes<CountDownAttributes>(presentation: presentation, metadata: .init(), tintColor: .orange)
-        
+
         /// Schedule
         let schedule = Alarm.Schedule.fixed(scheduleDate)
-        
+
         /// Configuration
         let config = AlarmManager.AlarmConfiguration(
             schedule: schedule,
             attributes: attributes,
             secondaryIntent: OpenAppIntent(id: id)
         )
-        
+
         /// Adding alarm to the System
         let _ = try await AlarmManager.shared.schedule(id: id, configuration: config)
         print("Alarm scheduled with ID: \(id)")
-            
-            
-                                                              
     }
 
     private func checkAndAuthorize() async throws {
@@ -114,23 +110,21 @@ struct OpenAppIntent: LiveActivityIntent {
     static var title: LocalizedStringResource = "Opens App"
     static var openAppWhenRun: Bool = true
     static var isDiscoverable: Bool = false
-    
+
     @Parameter
     var id: String
-    
+
     init(id: UUID) {
         self.id = id.uuidString
     }
-    
-    init() {
-        
-    }
-    
+
+    init() {}
+
     func perform() async throws -> some IntentResult {
         if let alarmID = UUID(uuidString: id) {
             print("Opening app for alarm with ID: \(alarmID)")
         }
-        
+
         return .result()
     }
 }
